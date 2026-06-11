@@ -211,61 +211,124 @@ h1{
     </div>
 
 </div><script>
+
 /* =========================
    PI NETWORK SDK
 ========================= */
+
+function setGuestMode(message = "Mode invité activé - Teste ta puissance !") {
+
+    const welcome = document.getElementById("welcomeText");
+
+    if (welcome) {
+        welcome.innerText = message;
+    }
+}
+
+function waitForPiSDK(maxWait = 10000) {
+
+    return new Promise((resolve, reject) => {
+
+        const start = Date.now();
+
+        const interval = setInterval(() => {
+
+            if (typeof Pi !== "undefined") {
+                clearInterval(interval);
+                resolve();
+                return;
+            }
+
+            if (Date.now() - start > maxWait) {
+                clearInterval(interval);
+                reject(new Error("Pi SDK timeout"));
+            }
+
+        }, 250);
+
+    });
+}
 
 async function initPiSDK() {
 
     try {
 
-        if (typeof Pi === "undefined") {
-            console.log("Pi SDK non disponible.");
-            return;
-        }
+        console.log("Chargement Pi SDK...");
+
+        await waitForPiSDK();
+
+        console.log("Pi SDK détecté");
 
         Pi.init({
             version: "2.0"
         });
 
-        const scopes = ["username"];
+        console.log("Pi SDK initialisé");
 
-        const auth = await Pi.authenticate(
-            scopes,
-            function(payment) {},
-            function(payment) {}
+        const authPromise = Pi.authenticate(
+            ["username"],
+            () => {},
+            () => {}
         );
 
-        console.log("Utilisateur Pi :", auth);
+        const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(
+                () => reject(new Error("Authentification timeout")),
+                10000
+            )
+        );
 
-        if (auth && auth.user) {
+        const auth = await Promise.race([
+            authPromise,
+            timeoutPromise
+        ]);
 
-            const username =
-                auth.user.username || "Shinobi";
+        console.log("Authentification réussie :", auth);
 
-            document.getElementById("welcomeText")
-                .innerText =
-                `Bienvenue, ${username} ! Teste ta puissance de shinobi`;
+        if (
+            auth &&
+            auth.user &&
+            auth.user.username
+        ) {
+
+            const welcome =
+                document.getElementById("welcomeText");
+
+            if (welcome) {
+                welcome.innerText =
+                    `Bienvenue, ${auth.user.username} ! Teste ta puissance de shinobi`;
+            }
+
+        } else {
+
+            setGuestMode();
 
         }
 
     } catch (error) {
 
         console.error(
-            "Erreur authentification Pi :",
+            "Erreur Pi SDK :",
             error
         );
+
+        setGuestMode();
 
     }
 }
 
 /* =========================
-   LANCEMENT PI SDK
+   LANCEMENT
 ========================= */
 
-window.addEventListener("load", () => {
-    initPiSDK();
+window.addEventListener("load", async () => {
+
+    console.log("Page chargée");
+
+    await initPiSDK();
+
 });
+
 /* =========================
    📦 VARIABLES PRINCIPALES
 ========================= */
