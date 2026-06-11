@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
+<hheadtml lang="fr">
+<>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -162,7 +162,7 @@ h1{
     .question{font-size:15px;}
 }
 </style>
-</head>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script></head>
 
 <body>
 
@@ -171,7 +171,9 @@ h1{
     <!-- START SCREEN -->
     <div id="start" class="screen active">
         <h1>🥷 Ninja Quiz</h1>
-        <p class="subtitle">Teste ta puissance de shinobi</p>
+        <p class="subtitle" id="welcomeText">
+    Teste ta puissance de shinobi
+</p>
 
         <button class="btn level-btn" onclick="start('genin')">Genin (Facile)</button>
         <button class="btn level-btn" onclick="start('chunin')">Chûnin (Moyen)</button>
@@ -209,7 +211,61 @@ h1{
     </div>
 
 </div><script>
+/* =========================
+   PI NETWORK SDK
+========================= */
 
+async function initPiSDK() {
+
+    try {
+
+        if (typeof Pi === "undefined") {
+            console.log("Pi SDK non disponible.");
+            return;
+        }
+
+        Pi.init({
+            version: "2.0"
+        });
+
+        const scopes = ["username"];
+
+        const auth = await Pi.authenticate(
+            scopes,
+            function(payment) {},
+            function(payment) {}
+        );
+
+        console.log("Utilisateur Pi :", auth);
+
+        if (auth && auth.user) {
+
+            const username =
+                auth.user.username || "Shinobi";
+
+            document.getElementById("welcomeText")
+                .innerText =
+                `Bienvenue, ${username} ! Teste ta puissance de shinobi`;
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Erreur authentification Pi :",
+            error
+        );
+
+    }
+}
+
+/* =========================
+   LANCEMENT PI SDK
+========================= */
+
+window.addEventListener("load", () => {
+    initPiSDK();
+});
 /* =========================
    📦 VARIABLES PRINCIPALES
 ========================= */
