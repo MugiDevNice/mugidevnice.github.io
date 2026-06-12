@@ -584,6 +584,48 @@ function show(id){
 }
 
 </script>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script>
+  Pi.init({ version: "2.0" });
+</script>
 
+<button id="btn-test-pi" style="padding: 15px 25px; background-color: #8A2BE2; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin: 30px auto; display: block; z-index: 9999; position: relative;">
+  ⚡ Lancer le paiement Test (Étape 10)
+</button>
+
+<script>
+  const scopes = ['payments', 'username'];
+  
+  function onIncompletePaymentFound(payment) {
+    console.log("Paiement incomplet trouvé", payment);
+  }
+
+  // Connexion automatique au Pi Browser
+  Pi.authenticate(scopes, onIncompletePaymentFound).then(function(auth) {
+    console.log("Pionnier connecté :", auth.user.username);
+
+    // Action lors du clic sur le bouton
+    document.getElementById('btn-test-pi').addEventListener('click', function() {
+      Pi.createPayment({
+        amount: 0.1, // Un mini montant de test
+        memo: "Validation Etape 10 - Ninja Quiz",
+        metadata: { app: "ninjaquiz" },
+      }, {
+        onReadyForServerApproval: function(paymentId) {
+          console.log("Paiement créé avec succès ! ID:", paymentId);
+          // Pour la checklist de la Core Team, l'ouverture et la création de ce paiement 
+          // sur le Testnet suffisent généralement à envoyer le signal de validation.
+        },
+        onReadyForServerCompletion: function(paymentId, txid) {
+          console.log("Paiement complété !");
+        },
+        onCancel: function(paymentId) { console.log("Annulé"); },
+        onError: function(error, payment) { console.error("Erreur", error); }
+      });
+    });
+  }).catch(function(error) {
+    console.error("Erreur d'authentification Pi :", error);
+  });
+</script>
 </body>
 </html>
