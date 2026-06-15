@@ -212,7 +212,12 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (error) {
 
             console.error("Erreur createPayment:", error);
-            alert("Erreur lors du paiement test.");
+            alert(
+    "Erreur Pi Payment :\n\n" +
+    (error?.message ||
+     JSON.stringify(error) ||
+     String(error))
+);
 
         }
 
@@ -692,8 +697,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
 
-            console.error("Erreur createPayment:", error);
-            alert("Erreur lors du paiement test.");
+    console.error(
+        "Erreur createPayment:",
+        error
+    );
+
+    alert(
+        "Erreur Pi Payment :\n\n" +
+        (error?.message ||
+         JSON.stringify(error) ||
+         String(error))
+    );
+
+}
 
         }
 
