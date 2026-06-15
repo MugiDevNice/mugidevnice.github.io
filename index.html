@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<hheadtml lang="fr">
-<>
+<html lang="fr">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -162,7 +162,66 @@ h1{
     .question{font-size:15px;}
 }
 </style>
-<script src="https://sdk.minepi.com/pi-sdk.js"></script></head>
+<script src="https://sdk.minepi.com/pi-sdk.js">
+/* =========================
+   🪙 PI PAYMENT TEST
+========================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const paymentButton = document.getElementById("paymentButton");
+
+    if (!paymentButton) return;
+
+    paymentButton.addEventListener("click", async () => {
+
+        try {
+
+            if (typeof Pi === "undefined") {
+                alert("Pi SDK non disponible");
+                return;
+            }
+
+            await Pi.createPayment(
+                {
+                    amount: 0.1,
+                    memo: "Ninja Quiz Test Payment",
+                    metadata: {
+                        item: "test-payment"
+                    }
+                },
+                {
+                    onReadyForServerApproval(paymentId) {
+                        console.log("Ready for approval:", paymentId);
+                    },
+
+                    onReadyForServerCompletion(paymentId, txid) {
+                        console.log("Ready for completion:", paymentId, txid);
+                    },
+
+                    onCancel(paymentId) {
+                        console.log("Paiement annulé:", paymentId);
+                    },
+
+                    onError(error) {
+                        console.error("Erreur paiement:", error);
+                    }
+                }
+            );
+
+        } catch (error) {
+
+            console.error("Erreur createPayment:", error);
+            alert("Erreur lors du paiement test.");
+
+        }
+
+    });
+
+});
+
+
+</script></head>
 
 <body>
 
@@ -178,6 +237,7 @@ h1{
         <button class="btn level-btn" onclick="start('genin')">Genin (Facile)</button>
         <button class="btn level-btn" onclick="start('chunin')">Chûnin (Moyen)</button>
         <button class="btn level-btn" onclick="start('kage')">Kage (Difficile)</button>
+        <button id="paymentButton" class="btn" style="background:#7b2cff;color:white;">🪙 Test Pi Payment (0.1 Pi)</button>
     </div>
 
     <!-- QUIZ SCREEN -->
@@ -583,49 +643,66 @@ function show(id){
     document.getElementById(id).classList.add("active");
 }
 
-</script>
-<script src="https://sdk.minepi.com/pi-sdk.js"></script>
-<script>
-  Pi.init({ version: "2.0" });
-</script>
 
-<button id="btn-test-pi" style="padding: 15px 25px; background-color: #8A2BE2; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin: 30px auto; display: block; z-index: 9999; position: relative;">
-  ⚡ Lancer le paiement Test (Étape 10)
-</button>
+/* =========================
+   🪙 PI PAYMENT TEST
+========================= */
 
-<script>
-  const scopes = ['payments', 'username'];
-  
-  function onIncompletePaymentFound(payment) {
-    console.log("Paiement incomplet trouvé", payment);
-  }
+document.addEventListener("DOMContentLoaded", () => {
 
-  // Connexion automatique au Pi Browser
-  Pi.authenticate(scopes, onIncompletePaymentFound).then(function(auth) {
-    console.log("Pionnier connecté :", auth.user.username);
+    const paymentButton = document.getElementById("paymentButton");
 
-    // Action lors du clic sur le bouton
-    document.getElementById('btn-test-pi').addEventListener('click', function() {
-      Pi.createPayment({
-        amount: 0.1, // Un mini montant de test
-        memo: "Validation Etape 10 - Ninja Quiz",
-        metadata: { app: "ninjaquiz" },
-      }, {
-        onReadyForServerApproval: function(paymentId) {
-          console.log("Paiement créé avec succès ! ID:", paymentId);
-          // Pour la checklist de la Core Team, l'ouverture et la création de ce paiement 
-          // sur le Testnet suffisent généralement à envoyer le signal de validation.
-        },
-        onReadyForServerCompletion: function(paymentId, txid) {
-          console.log("Paiement complété !");
-        },
-        onCancel: function(paymentId) { console.log("Annulé"); },
-        onError: function(error, payment) { console.error("Erreur", error); }
-      });
+    if (!paymentButton) return;
+
+    paymentButton.addEventListener("click", async () => {
+
+        try {
+
+            if (typeof Pi === "undefined") {
+                alert("Pi SDK non disponible");
+                return;
+            }
+
+            await Pi.createPayment(
+                {
+                    amount: 0.1,
+                    memo: "Ninja Quiz Test Payment",
+                    metadata: {
+                        item: "test-payment"
+                    }
+                },
+                {
+                    onReadyForServerApproval(paymentId) {
+                        console.log("Ready for approval:", paymentId);
+                    },
+
+                    onReadyForServerCompletion(paymentId, txid) {
+                        console.log("Ready for completion:", paymentId, txid);
+                    },
+
+                    onCancel(paymentId) {
+                        console.log("Paiement annulé:", paymentId);
+                    },
+
+                    onError(error) {
+                        console.error("Erreur paiement:", error);
+                    }
+                }
+            );
+
+        } catch (error) {
+
+            console.error("Erreur createPayment:", error);
+            alert("Erreur lors du paiement test.");
+
+        }
+
     });
-  }).catch(function(error) {
-    console.error("Erreur d'authentification Pi :", error);
-  });
+
+});
+
+
 </script>
+
 </body>
 </html>
