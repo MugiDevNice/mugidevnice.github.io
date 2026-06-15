@@ -648,75 +648,119 @@ function show(id){
     document.getElementById(id).classList.add("active");
 }
 
-
 /* =========================
-   🪙 PI PAYMENT TEST
+   🧠 SAFE PI SDK (ANTI-CRASH)
 ========================= */
 
-document.addEventListener("DOMContentLoaded", () => {
+function safeLog(msg, data) {
+    console.log(msg, data || "");
+}
 
-    const paymentButton = document.getElementById("paymentButton");
+async function initPiSDK() {
 
-    if (!paymentButton) return;
+    try {
 
-    paymentButton.addEventListener("click", async () => {
+        if (!window.Pi) {
+            safeLog("Pi SDK non chargé");
+            return;
+        }
+
+        Pi.init({ version: "2.0" });
+
+        const auth = await Pi.authenticate(
+            ["username"],
+            () => {},
+            () => {}
+        );
+
+        safeLog("Auth Pi:", auth);
+
+        if (auth?.user?.username) {
+
+            const el = document.getElementById("welcomeText");
+
+            if (el) {
+                el.innerText =
+                    `Bienvenue, ${auth.user.username} ! Teste ta puissance de shinobi`;
+            }
+        }
+
+    } catch (e) {
+        safeLog("Erreur Pi auth", e);
+    }
+}
+
+/* =========================
+   🪙 SAFE PAYMENT BUTTON
+========================= */
+
+function initPaymentButton() {
+
+    const btn = document.getElementById("paymentButton");
+
+    if (!btn) return;
+
+    btn.addEventListener("click", async () => {
 
         try {
 
-            if (typeof Pi === "undefined") {
+            if (!window.Pi) {
                 alert("Pi SDK non disponible");
                 return;
             }
 
-            await Pi.createPayment(
+            safeLog("Lancement paiement...");
+
+            const payment = await Pi.createPayment(
                 {
                     amount: 0.1,
                     memo: "Ninja Quiz Test Payment",
-                    metadata: {
-                        item: "test-payment"
-                    }
+                    metadata: { type: "test" }
                 },
                 {
-                    onReadyForServerApproval(paymentId) {
-                        console.log("Ready for approval:", paymentId);
+                    onReadyForServerApproval: (paymentId) => {
+                        safeLog("Approval:", paymentId);
                     },
 
-                    onReadyForServerCompletion(paymentId, txid) {
-                        console.log("Ready for completion:", paymentId, txid);
+                    onReadyForServerCompletion: (paymentId, txid) => {
+                        safeLog("Completion:", paymentId, txid);
                     },
 
-                    onCancel(paymentId) {
-                        console.log("Paiement annulé:", paymentId);
+                    onCancel: (paymentId) => {
+                        alert("Paiement annulé");
+                        safeLog("Cancel:", paymentId);
                     },
 
-                    onError(error) {
-                        console.error("Erreur paiement:", error);
+                    onError: (err) => {
+                        console.log("PAY ERROR:", err);
+                        alert("Erreur paiement : " + (err?.message || err));
                     }
                 }
             );
 
-        } catch (error) {
+            safeLog("Payment result:", payment);
 
-    console.error(
-        "Erreur createPayment:",
-        error
-    );
+        } catch (e) {
 
-    alert(
-        "Erreur Pi Payment :\n\n" +
-        (error?.message ||
-         JSON.stringify(error) ||
-         String(error))
-    );
+            console.log("CATCH PAYMENT ERROR:", e);
 
-}
+            alert("Erreur paiement : " + (e?.message || e));
 
         }
 
     });
+}
+
+/* =========================
+   🚀 SAFE START (IMPORTANT)
+========================= */
+
+window.addEventListener("load", () => {
+
+    initPiSDK();
+    initPaymentButton();
 
 });
-
 
 </script>
 
