@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
+<hheadtml lang="fr">
+<>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -162,71 +162,7 @@ h1{
     .question{font-size:15px;}
 }
 </style>
-<script src="https://sdk.minepi.com/pi-sdk.js">
-/* =========================
-   🪙 PI PAYMENT TEST
-========================= */
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    const paymentButton = document.getElementById("paymentButton");
-
-    if (!paymentButton) return;
-
-    paymentButton.addEventListener("click", async () => {
-
-        try {
-
-            if (typeof Pi === "undefined") {
-                alert("Pi SDK non disponible");
-                return;
-            }
-
-            await Pi.createPayment(
-                {
-                    amount: 0.1,
-                    memo: "Ninja Quiz Test Payment",
-                    metadata: {
-                        item: "test-payment"
-                    }
-                },
-                {
-                    onReadyForServerApproval(paymentId) {
-                        console.log("Ready for approval:", paymentId);
-                    },
-
-                    onReadyForServerCompletion(paymentId, txid) {
-                        console.log("Ready for completion:", paymentId, txid);
-                    },
-
-                    onCancel(paymentId) {
-                        console.log("Paiement annulé:", paymentId);
-                    },
-
-                    onError(error) {
-                        console.error("Erreur paiement:", error);
-                    }
-                }
-            );
-
-        } catch (error) {
-
-            console.error("Erreur createPayment:", error);
-            alert(
-    "Erreur Pi Payment :\n\n" +
-    (error?.message ||
-     JSON.stringify(error) ||
-     String(error))
-);
-
-        }
-
-    });
-
-});
-
-
-</script></head>
+<script src="https://sdk.minepi.com/pi-sdk.js"></script></head>
 
 <body>
 
@@ -242,7 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
         <button class="btn level-btn" onclick="start('genin')">Genin (Facile)</button>
         <button class="btn level-btn" onclick="start('chunin')">Chûnin (Moyen)</button>
         <button class="btn level-btn" onclick="start('kage')">Kage (Difficile)</button>
-        <button id="paymentButton" class="btn" style="background:#7b2cff;color:white;">🪙 Test Pi Payment (0.1 Pi)</button>
     </div>
 
     <!-- QUIZ SCREEN -->
@@ -331,7 +266,7 @@ async function initPiSDK() {
         console.log("Pi SDK initialisé");
 
         const authPromise = Pi.authenticate(
-            ["username"],
+            ["username", "payments"],
             () => {},
             () => {}
         );
@@ -647,120 +582,6 @@ function show(id){
 
     document.getElementById(id).classList.add("active");
 }
-
-/* =========================
-   🧠 SAFE PI SDK (ANTI-CRASH)
-========================= */
-
-function safeLog(msg, data) {
-    console.log(msg, data || "");
-}
-
-async function initPiSDK() {
-
-    try {
-
-        if (!window.Pi) {
-            safeLog("Pi SDK non chargé");
-            return;
-        }
-
-        Pi.init({ version: "2.0" });
-
-        const auth = await Pi.authenticate(
-            ["username"],
-            () => {},
-            () => {}
-        );
-
-        safeLog("Auth Pi:", auth);
-
-        if (auth?.user?.username) {
-
-            const el = document.getElementById("welcomeText");
-
-            if (el) {
-                el.innerText =
-                    `Bienvenue, ${auth.user.username} ! Teste ta puissance de shinobi`;
-            }
-        }
-
-    } catch (e) {
-        safeLog("Erreur Pi auth", e);
-    }
-}
-
-/* =========================
-   🪙 SAFE PAYMENT BUTTON
-========================= */
-
-function initPaymentButton() {
-
-    const btn = document.getElementById("paymentButton");
-
-    if (!btn) return;
-
-    btn.addEventListener("click", async () => {
-
-        try {
-
-            if (!window.Pi) {
-                alert("Pi SDK non disponible");
-                return;
-            }
-
-            safeLog("Lancement paiement...");
-
-            const payment = await Pi.createPayment(
-                {
-                    amount: 0.1,
-                    memo: "Ninja Quiz Test Payment",
-                    metadata: { type: "test" }
-                },
-                {
-                    onReadyForServerApproval: (paymentId) => {
-                        safeLog("Approval:", paymentId);
-                    },
-
-                    onReadyForServerCompletion: (paymentId, txid) => {
-                        safeLog("Completion:", paymentId, txid);
-                    },
-
-                    onCancel: (paymentId) => {
-                        alert("Paiement annulé");
-                        safeLog("Cancel:", paymentId);
-                    },
-
-                    onError: (err) => {
-                        console.log("PAY ERROR:", err);
-                        alert("Erreur paiement : " + (err?.message || err));
-                    }
-                }
-            );
-
-            safeLog("Payment result:", payment);
-
-        } catch (e) {
-
-            console.log("CATCH PAYMENT ERROR:", e);
-
-            alert("Erreur paiement : " + (e?.message || e));
-
-        }
-
-    });
-}
-
-/* =========================
-   🚀 SAFE START (IMPORTANT)
-========================= */
-
-window.addEventListener("load", () => {
-
-    initPiSDK();
-    initPaymentButton();
-
-});
 
 </script>
 
