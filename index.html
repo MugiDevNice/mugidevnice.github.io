@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<hheadtml lang="fr">
-<>
+<html lang="fr">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -168,7 +168,6 @@ h1{
 
 <div class="container">
 
-    <!-- START SCREEN -->
     <div id="start" class="screen active">
         <h1>🥷 Ninja Quiz</h1>
         <p class="subtitle" id="welcomeText">
@@ -180,7 +179,6 @@ h1{
         <button class="btn level-btn" onclick="start('kage')">Kage (Difficile)</button>
     </div>
 
-    <!-- QUIZ SCREEN -->
     <div id="quiz" class="screen">
 
         <div class="top-bar">
@@ -199,7 +197,6 @@ h1{
 
     </div>
 
-    <!-- RESULT SCREEN -->
     <div id="result" class="screen result">
 
         <h1>Mission terminée</h1>
@@ -274,7 +271,7 @@ async function initPiSDK() {
         const timeoutPromise = new Promise((_, reject) =>
             setTimeout(
                 () => reject(new Error("Authentification timeout")),
-                10000
+                30000
             )
         );
 
@@ -307,9 +304,12 @@ async function initPiSDK() {
 
     } catch (error) {
 
-        console.error(
-            "Erreur Pi SDK :",
-            error
+        console.error("AUTH ERROR:", error);
+
+        alert(
+            error?.message ||
+            JSON.stringify(error) ||
+            String(error)
         );
 
         setGuestMode();
