@@ -605,104 +605,72 @@ function show(id){
 
 function initPaymentButton() {
 
-    const button =
-        document.getElementById("paymentButton");
-
+    const button = document.getElementById("paymentButton");
     if (!button) return;
 
     button.addEventListener("click", async () => {
-
         try {
-
             if (typeof Pi === "undefined") {
-                throw new Error(
-                    "Pi SDK non disponible"
-                );
+                throw new Error("Pi SDK non disponible");
             }
 
-            console.log(
-                "Création paiement test..."
-            );
+            console.log("Création paiement test...");
 
             await Pi.createPayment(
                 {
                     amount: 0.1,
                     memo: "Ninja Quiz Test Payment",
-                    metadata: {
-                        item: "ninja-quiz-test"
-                    }
+                    metadata: { item: "ninja-quiz-test" }
                 },
                 {
-                    onReadyForServerApproval:
-                        function(paymentId) {
-
-                        console.log(
-                            "Approval:",
-                            paymentId
-                        );
-
+                    onReadyForServerApproval: async function(paymentId) {
+                        console.log("Approval envoyé au backend:", paymentId);
+                        try {
+                            const res = await fetch("/api/approve", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ paymentId })
+                            });
+                            const result = await res.json();
+                            console.log("Backend Approve OK:", result);
+                        } catch (err) {
+                            console.error("Erreur d'approbation backend:", err);
+                        }
                     },
 
-                    onReadyForServerCompletion:
-                        function(paymentId, txid) {
-
-                        console.log(
-                            "Completion:",
-                            paymentId,
-                            txid
-                        );
-
+                    onReadyForServerCompletion: async function(paymentId, txid) {
+                        console.log("Completion envoyée au backend:", paymentId, txid);
+                        try {
+                            const res = await fetch("/api/complete", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ paymentId, txid })
+                              });
+                              const result = await res.json();
+                              console.log("Backend Complete OK:", result);
+                              alert("Félicitations ! Paiement validé avec succès !");
+                        } catch (err) {
+                            console.error("Erreur de complétion backend:", err);
+                        }
                     },
 
-                    onCancel:
-                        function(paymentId) {
-
-                        console.log(
-                            "Annulé:",
-                            paymentId
-                        );
-
-                        alert(
-                            "Paiement annulé"
-                        );
-
+                    onCancel: function(paymentId) {
+                        console.log("Annulé:", paymentId);
+                        alert("Paiement annulé");
                     },
 
-                    onError:
-                        function(error) {
-
-                        console.error(
-                            "Payment Error:",
-                            error
-                        );
-
-                        alert(
-                            error?.message ||
-                            JSON.stringify(error) ||
-                            String(error)
-                        );
-
+                    onError: function(error) {
+                        console.error("Payment Error:", error);
+                        alert(error?.message || JSON.stringify(error) || String(error));
                     }
                 }
             );
 
         } catch (error) {
-
-            console.error(
-                "CREATE PAYMENT ERROR:",
-                error
-            );
-
-            alert(
-                error?.message ||
-                JSON.stringify(error) ||
-                String(error)
-            );
-
+            console.error("CREATE PAYMENT ERROR:", error);
+            alert(error?.message || JSON.stringify(error) || String(error));
         }
-
     });
-
 }
 
 </script>
