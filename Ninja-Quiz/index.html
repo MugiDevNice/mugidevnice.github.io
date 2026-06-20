@@ -626,7 +626,9 @@ function initPaymentButton() {
                     onReadyForServerApproval: async function(paymentId) {
                         console.log("Approval envoyé au backend:", paymentId);
                         try {
-                            const res = await fetch("/api/approve", {
+                            const res = await fetch(
+    "https://mugidevnice-github-fqdchbk0l-sf-at0.vercel.app/api/approve",
+    {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify({ paymentId })
@@ -641,7 +643,9 @@ function initPaymentButton() {
                     onReadyForServerCompletion: async function(paymentId, txid) {
                         console.log("Completion envoyée au backend:", paymentId, txid);
                         try {
-                            const res = await fetch("/api/complete", {
+                            const res = await fetch(
+    "https://mugidevnice-github-fqdchbk0l-sf-at0.vercel.app/api/complete",
+    {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify({ paymentId, txid })
