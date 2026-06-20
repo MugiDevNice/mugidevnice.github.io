@@ -24,15 +24,16 @@ module.exports = async function handler(req, res) {
     // 4. Étape A : Approuver le paiement auprès de Pi Network
     const approveResponse = await axios.post(
       `https://api.minepi.com/v2/payments/${paymentId}/approve`,
-      {}, // body vide, le paymentId est dans l'URL
+      {},
       {
         headers: {
-          Authorization: `Key ${apiKey}`,
+          Authorization: `Key ${apiKey}`, // <-- Corrigé ici avec des backticks !
           "Content-Type": "application/json",
         },
         timeout: 15000, // 15 secondes max
       }
     );
+
 
     const payment = approveResponse.data;
 
