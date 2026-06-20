@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Ninja Quiz Premium</title>
 
 <style>
@@ -24,7 +23,6 @@ body{
     padding:10px;
 }
 
-/* 📱 MOBILE FIRST CONTAINER */
 .container{
     width: 90%;
     max-width: 450px;
@@ -35,7 +33,6 @@ body{
     box-shadow: 0 0 25px rgba(255,50,0,0.2);
 }
 
-/* TITRE */
 h1{
     text-align:center;
     color:#ff4d00;
@@ -43,7 +40,6 @@ h1{
     margin-bottom:10px;
 }
 
-/* SCREENS */
 .screen{display:none;}
 .screen.active{display:block;}
 
@@ -54,7 +50,6 @@ h1{
     margin-bottom:15px;
 }
 
-/* BOUTONS */
 .btn{
     width:100%;
     padding:14px;
@@ -63,39 +58,19 @@ h1{
     border-radius:12px;
     font-weight:bold;
     cursor:pointer;
-    transition:0.2s;
-    font-size:14px;
 }
 
-.btn:hover{
-    transform:scale(1.03);
-}
-
-/* LEVEL BUTTONS */
 .level-btn{
     background: linear-gradient(45deg,#ff4d00,#ff0000);
     color:white;
 }
 
-/* QUIZ HEADER */
 .top-bar{
     display:flex;
     justify-content:space-between;
     font-size:13px;
-    margin-bottom:10px;
 }
 
-/* TIMER */
-.timer{
-    color:#ffcc00;
-}
-
-/* LIVES */
-.lives{
-    color:#ff4d4d;
-}
-
-/* PROGRESS BAR */
 .progress{
     width:100%;
     height:10px;
@@ -109,16 +84,10 @@ h1{
     height:100%;
     width:0%;
     background:linear-gradient(90deg,#ff0000,#ff7b00);
-    transition:0.3s;
 }
 
-/* QUESTION */
-.question{
-    font-size:16px;
-    margin:15px 0;
-}
+.question{margin:15px 0;}
 
-/* ANSWERS */
 .answer{
     background:#1a1a1a;
     border:1px solid #333;
@@ -127,25 +96,11 @@ h1{
     border-radius:10px;
     margin-top:8px;
     cursor:pointer;
-    transition:0.2s;
-    font-size:14px;
 }
 
-.answer:hover{
-    background:#2a2a2a;
-    border-color:#ff4d00;
-}
+.result{text-align:center;}
 
-/* RESULT */
-.result{
-    text-align:center;
-}
-
-.big{
-    font-size:22px;
-    color:#ff7b00;
-    margin:15px 0;
-}
+.big{font-size:22px;color:#ff7b00;}
 
 .badge{
     padding:8px 12px;
@@ -155,534 +110,205 @@ h1{
     display:inline-block;
     margin-top:10px;
 }
-
-/* RESPONSIVE TACTILE */
-@media (max-width:400px){
-    .container{width:95%;}
-    .question{font-size:15px;}
-}
 </style>
-<script src="https://sdk.minepi.com/pi-sdk.js"></script></head>
+
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
+</head>
 
 <body>
 
 <div class="container">
 
-    <div id="start" class="screen active">
-        <h1>🥷 Ninja Quiz</h1>
-        <p class="subtitle" id="welcomeText">
-    Teste ta puissance de shinobi
-</p>
+<div id="start" class="screen active">
+    <h1>🥷 Ninja Quiz</h1>
 
-        <button class="btn level-btn" onclick="start('genin')">Genin (Facile)</button>
-        <button class="btn level-btn" onclick="start('chunin')">Chûnin (Moyen)</button>
-        <button class="btn level-btn" onclick="start('kage')">Kage (Difficile)</button>
+    <p class="subtitle" id="welcomeText">
+        Teste ta puissance de shinobi
+    </p>
 
-        <button id="paymentButton"
-                class="btn"
-                style="background:#7b2cff;color:white;">
-            🪙 Test Pi Payment (0.1 Pi)
-        </button>
+    <button class="btn level-btn" onclick="start('genin')">Genin</button>
+    <button class="btn level-btn" onclick="start('chunin')">Chûnin</button>
+    <button class="btn level-btn" onclick="start('kage')">Kage</button>
+
+    <button id="paymentButton" class="btn" style="background:#7b2cff;color:white;">
+        🪙 Test Pi Payment (0.1 Pi)
+    </button>
+</div>
+
+<div id="quiz" class="screen">
+    <div class="top-bar">
+        <div id="score">Score: 0</div>
+        <div>⏱ <span id="time">15</span>s</div>
+        <div>❤️ <span id="life">3</span></div>
     </div>
 
-    <div id="quiz" class="screen">
-
-        <div class="top-bar">
-            <div id="score">Score: 0</div>
-            <div class="timer">⏱ <span id="time">15</span>s</div>
-            <div class="lives">❤️ <span id="life">3</span></div>
-        </div>
-
-        <div class="progress">
-            <div id="progress" class="progress-fill"></div>
-        </div>
-
-        <div id="question" class="question"></div>
-
-        <div id="answers"></div>
-
+    <div class="progress">
+        <div id="progress" class="progress-fill"></div>
     </div>
 
-    <div id="result" class="screen result">
+    <div id="question"></div>
+    <div id="answers"></div>
+</div>
 
-        <h1>Mission terminée</h1>
-        <div class="big" id="finalScore"></div>
-        <div id="rank"></div>
-        <div class="badge" id="badge"></div>
+<div id="result" class="screen result">
+    <h1>Mission terminée</h1>
+    <div class="big" id="finalScore"></div>
+    <div id="rank"></div>
+    <div class="badge" id="badge"></div>
 
-        <button class="btn level-btn" onclick="location.reload()">Rejouer</button>
-    </div>
+    <button class="btn level-btn" onclick="location.reload()">Rejouer</button>
+</div>
 
-</div><script>
+</div>
 
-/* =========================
-   PI NETWORK SDK
-========================= */
+<script>
+/* ================= PI SDK ================= */
 
-function setGuestMode(message = "Mode invité activé - Teste ta puissance !") {
-
-    const welcome = document.getElementById("welcomeText");
-
-    if (welcome) {
-        welcome.innerText = message;
-    }
-}
-
-function waitForPiSDK(maxWait = 30000) {
-
-    return new Promise((resolve, reject) => {
-
-        const start = Date.now();
-
-        const interval = setInterval(() => {
-
-            if (typeof Pi !== "undefined") {
-                clearInterval(interval);
-                resolve();
-                return;
+function waitForPi(){
+    return new Promise((res,rej)=>{
+        let t = setInterval(()=>{
+            if(window.Pi){
+                clearInterval(t);
+                res();
             }
-
-            if (Date.now() - start > maxWait) {
-                clearInterval(interval);
-                reject(new Error("Pi SDK timeout"));
-            }
-
-        }, 250);
-
+        },200);
+        setTimeout(()=>rej("timeout"),10000);
     });
 }
 
-async function initPiSDK() {
+async function initPi(){
+    try{
+        await waitForPi();
+        Pi.init({ version:"2.0" });
 
-    try {
+        const auth = await Pi.authenticate(["username","payments"]);
 
-        console.log("Chargement Pi SDK...");
-
-        await waitForPiSDK(30000);
-
-        console.log("Pi SDK détecté");
-
-        if (typeof Pi === "undefined") {
-            throw new Error("Pi SDK introuvable");
+        if(auth?.user?.username){
+            document.getElementById("welcomeText").innerText =
+                "Bienvenue, " + auth.user.username;
         }
 
-        // Initialisation SDK
-        Pi.init({
-            version: "2.0"
-        });
-
-        console.log("PI INIT OK");
-
-        // On laisse le SDK respirer 1 seconde
-        await new Promise(resolve =>
-            setTimeout(resolve, 1000)
-        );
-
-        console.log("AUTH START");
-
-        const auth = await Pi.authenticate(
-            ["username", "payments"],
-            function() {},
-            function() {}
-        );
-
-        console.log("AUTH SUCCESS", auth);
-
-        if (
-            auth &&
-            auth.user &&
-            auth.user.username
-        ) {
-
-            document.getElementById(
-                "welcomeText"
-            ).innerText =
-                `Bienvenue, ${auth.user.username} ! Teste ta puissance de shinobi`;
-
-        } else {
-
-            setGuestMode(
-                "Connexion Pi incomplète"
-            );
-
-        }
-
-    } catch (error) {
-
-        console.error(
-            "AUTH ERROR:",
-            error
-        );
-
-        alert(
-            "AUTH ERROR :\n\n" +
-            (
-                error?.message ||
-                JSON.stringify(error) ||
-                String(error)
-            )
-        );
-
-        setGuestMode(
-            "Mode invité activé - Teste ta puissance !"
-        );
-
+    }catch(e){
+        console.log("Pi error",e);
     }
-
 }
 
-/* =========================
-   LANCEMENT
-========================= */
-
-window.addEventListener("load", async () => {
-
-    console.log("Page chargée");
-
-    await initPiSDK();
-
-    initPaymentButton();
-
-});
-
-/* =========================
-   📦 VARIABLES PRINCIPALES
-========================= */
+/* ================= GAME ================= */
 
 let data = {
-    genin: [
-        {q:"Quel est le rêve de Naruto ?", a:["Devenir Hokage","Être riche","Quitter le village","Devenir méchant"], c:0},
-        {q:"Qui est le maître de l’équipe 7 ?", a:["Kakashi","Iruka","Jiraya","Asuma"], c:0},
-        {q:"Quel est le plat préféré de Naruto ?", a:["Ramen","Sushi","Riz","Poulet"], c:0},
-        {q:"Quel village Naruto protège ?", a:["Konoha","Suna","Kiri","Iwa"], c:0},
-        {q:"Quel démon est en Naruto ?", a:["Kyûbi","Shukaku","Matatabi","Hachibi"], c:0},
-        {q:"Quel est le nom de famille de Sasuke ?", a:["Uchiha","Hyuga","Nara","Akimichi"], c:0},
-        {q:"Qui est Sakura ?", a:["Ninja médicale","Samouraï","Kunoichi de Suna","ANBU"], c:0},
-        {q:"Qui entraîne Naruto au début ?", a:["Kakashi","Jiraya","Orochimaru","Minato"], c:0},
-        {q:"Quel est le symbole de Konoha ?", a:["Feuille","Flamme","Lune","Étoile"], c:0},
-        {q:"Naruto est de quel type de ninja ?", a:["Genin","Kage","ANBU","Rogue"], c:0}
+    genin:[
+        {q:"Naruto veut devenir ?",a:["Hokage","Roi","Samurai","Sannin"],c:0}
     ],
-
-    chunin: [
-        {q:"Qui a créé le Rasengan ?", a:["Minato","Naruto","Kakashi","Tobirama"], c:0},
-        {q:"Quelle est l’arme de Kisame ?", a:["Samehada","Kubikiribōchō","Kusanagi","Gunbai"], c:0},
-        {q:"Combien de membres dans l’Akatsuki (original) ?", a:["10","9","8","7"], c:0},
-        {q:"Qui contrôle les ombres ?", a:["Clan Nara","Uchiha","Hyuga","Yamanaka"], c:0},
-        {q:"Quel œil utilise le Sharingan ?", a:["Uchiha","Senju","Hyuga","Inuzuka"], c:0},
-        {q:"Qui est Pain ?", a:["Nagato","Obito","Itachi","Madara"], c:0},
-        {q:"Quel est le but de l’Akatsuki ?", a:["Bijuu","Paix","Argent","Protection"], c:0},
-        {q:"Qui est le frère de Itachi ?", a:["Sasuke","Naruto","Kakashi","Neji"], c:0},
-        {q:"Quelle technique est le Rasengan ?", a:["Orbe","Feu","Foudre","Invocation"], c:0},
-        {q:"Qui est le sensei de Naruto ?", a:["Jiraya","Kakashi","Iruka","Asuma"], c:0}
+    chunin:[
+        {q:"Rasengan créé par ?",a:["Minato","Naruto","Kakashi","Sasuke"],c:0}
     ],
-
-    kage: [
-        {q:"Nom complet du 1er Hokage ?", a:["Hashirama Senju","Tobirama Senju","Hiruzen Sarutobi","Minato Namikaze"], c:0},
-        {q:"Combien de cœurs possède Kakuzu ?", a:["5","4","3","6"], c:0},
-        {q:"Qui est Tobi vraiment ?", a:["Obito","Madara","Zetsu","Nagato"], c:0},
-        {q:"Qui a le Rinnegan original ?", a:["Hagoromo","Naruto","Sasuke","Itachi"], c:0},
-        {q:"Technique interdite de Tobirama ?", a:["Edo Tensei","Amaterasu","Kirin","Chidori"], c:0},
-        {q:"Clan de Shikamaru ?", a:["Nara","Uchiha","Hyuga","Akimichi"], c:0},
-        {q:"Qui a tué les Uchiha ?", a:["Itachi","Sasuke","Madara","Obito"], c:0},
-        {q:"Quel bijuu a 8 queues ?", a:["Hachibi","Kyubi","Shukaku","Matatabi"], c:0},
-        {q:"Qui est le Rikudo Sennin ?", a:["Hagoromo","Hamura","Indra","Ashura"], c:0},
-        {q:"Quel est le pouvoir de Kamui ?", a:["Téléportation dimensionnelle","Feu","Vent","Eau"], c:0}
+    kage:[
+        {q:"1er Hokage ?",a:["Hashirama","Tobirama","Minato","Hiruzen"],c:0}
     ]
 };
 
-/* =========================
-   🎮 GAME STATE
-========================= */
+let level="",questions=[],index=0,score=0,lives=3,timer;
 
-let level = "";
-let questions = [];
-let index = 0;
-let score = 0;
-let lives = 3;
-let time = 15;
-let timer;
+/* ================= GAME ================= */
 
-/* =========================
-   🔊 SOUND (WEB AUDIO API)
-========================= */
-
-function beep(freq=440,duration=100){
-    let ctx = new (window.AudioContext || window.webkitAudioContext)();
-    let osc = ctx.createOscillator();
-    let gain = ctx.createGain();
-
-    osc.frequency.value = freq;
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start();
-    osc.stop(ctx.currentTime + duration/1000);
-}
-
-/* =========================
-   🚀 START GAME
-========================= */
-
-function start(lvl){
-    level = lvl;
-    questions = shuffle(data[lvl]).slice(0,10);
-    index = 0;
-    score = 0;
-    lives = 3;
-
+function start(l){
+    level=l;
+    questions=data[l];
+    index=0;
+    score=0;
+    lives=3;
     show("quiz");
     load();
 }
 
-/* =========================
-   🔀 SHUFFLE
-========================= */
-
-function shuffle(arr){
-    return arr.sort(()=>Math.random()-0.5);
-}
-
-/* =========================
-   📌 LOAD QUESTION
-========================= */
-
 function load(){
-
-    if(lives <= 0){
-        return end(false);
+    if(index>=questions.length || lives<=0){
+        return end();
     }
 
-    if(index >= questions.length){
-        return end(true);
-    }
+    let q=questions[index];
+    document.getElementById("question").innerText=q.q;
+    document.getElementById("score").innerText="Score: "+score;
 
-    let q = questions[index];
+    let c=document.getElementById("answers");
+    c.innerHTML="";
 
-    document.getElementById("question").innerText = q.q;
-    document.getElementById("score").innerText = "Score: " + score;
-    document.getElementById("life").innerText = lives;
-
-    let container = document.getElementById("answers");
-    container.innerHTML = "";
-
-    q.a.forEach((ans,i)=>{
-        let btn = document.createElement("button");
-        btn.className = "answer";
-        btn.innerText = ans;
-
-        btn.onclick = ()=>check(i,q.c);
-
-        container.appendChild(btn);
+    q.a.forEach((a,i)=>{
+        let b=document.createElement("button");
+        b.className="answer";
+        b.innerText=a;
+        b.onclick=()=>check(i,q.c);
+        c.appendChild(b);
     });
-
-    startTimer();
-
-    updateProgress();
 }
-
-/* =========================
-   ⏱ TIMER
-========================= */
-
-function startTimer(){
-    clearInterval(timer);
-    time = 15;
-    document.getElementById("time").innerText = time;
-
-    timer = setInterval(()=>{
-        time--;
-        document.getElementById("time").innerText = time;
-
-        if(time <= 0){
-            clearInterval(timer);
-            wrong();
-        }
-    },1000);
-}
-
-/* =========================
-   ✔ CHECK ANSWER
-========================= */
 
 function check(i,c){
-
-    clearInterval(timer);
-
-    if(i === c){
-        score++;
-        beep(600,80);
-    }else{
-        wrong();
-        return;
-    }
+    if(i===c)score++;
+    else lives--;
 
     index++;
-    setTimeout(load,500);
+    load();
 }
-
-/* =========================
-   ❌ WRONG ANSWER
-========================= */
-
-function wrong(){
-    lives--;
-    beep(200,200);
-    index++;
-    setTimeout(load,500);
-}
-
-/* =========================
-   📊 PROGRESS
-========================= */
-
-function updateProgress(){
-    let p = (index / 10) * 100;
-    document.getElementById("progress").style.width = p + "%";
-}
-
-/* =========================
-   🏁 END GAME
-========================= */
-
-function end(win){
-
-    show("result");
-
-    let rank = "";
-    let badge = "";
-
-    if(score <= 3){
-        rank = "👹 Ninja Déserteur";
-        badge = "Tu dois t'entraîner...";
-    }
-    else if(score <= 6){
-        rank = "🥷 Genin prometteur";
-        badge = "Continue ton entraînement";
-    }
-    else if(score <= 8){
-        rank = "🔥 Jônin redoutable";
-        badge = "Très bon niveau ninja";
-    }
-    else{
-        rank = "👑 Hokage potentiel";
-        badge = "Légende du village";
-    }
-
-    document.getElementById("finalScore").innerText =
-        score + " / 10";
-
-    document.getElementById("rank").innerText = rank;
-    document.getElementById("badge").innerText = badge;
-
-    save(score);
-}
-
-/* =========================
-   💾 LOCAL STORAGE
-========================= */
-
-function save(s){
-    let best = localStorage.getItem("ninja_best") || 0;
-    if(s > best){
-        localStorage.setItem("ninja_best", s);
-    }
-}
-
-/* =========================
-   📺 SCREEN SWITCH
-========================= */
 
 function show(id){
-    document.querySelectorAll(".screen")
-        .forEach(e=>e.classList.remove("active"));
-
+    document.querySelectorAll(".screen").forEach(e=>e.classList.remove("active"));
     document.getElementById(id).classList.add("active");
 }
 
-/* =========================
-   🪙 PI TEST PAYMENT
-========================= */
-
-function initPaymentButton() {
-
-    const button = document.getElementById("paymentButton");
-    if (!button) return;
-
-    button.addEventListener("click", async () => {
-        try {
-            if (typeof Pi === "undefined") {
-                throw new Error("Pi SDK non disponible");
-            }
-
-            console.log("Création paiement test...");
-
-            await Pi.createPayment(
-                {
-                    amount: 0.1,
-                    memo: "Ninja Quiz Test Payment",
-                    metadata: { item: "ninja-quiz-test" }
-                },
-                {
-                    onReadyForServerApproval: async function(paymentId) {
-
-    alert("APPROVAL APPELÉ : " + paymentId);
-
-    console.log("APPROVAL APPELÉ :", paymentId);
-
+function end(){
+    show("result");
+    document.getElementById("finalScore").innerText=score;
+    document.getElementById("rank").innerText="Fin du jeu";
 }
-                        console.log("Approval envoyé au backend:", paymentId);
-                        try {
-                            const res = await fetch(
-"/api/approve",
-{
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ paymentId })
-                            });
-                            const result = await res.json();
-                            console.log("Backend Approve OK:", result);
-                        } catch (err) {
-                            console.error("Erreur d'approbation backend:", err);
-                        }
-                    },
 
-                    onReadyForServerCompletion: async function(paymentId, txid) {
-                        console.log("Completion envoyée au backend:", paymentId, txid);
-                        try {
-                            const res = await fetch(
-"/api/complete",
-{
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ paymentId, txid })
-                              });
-                              const result = await res.json();
-                              console.log("Backend Complete OK:", result);
-                              alert("Félicitations ! Paiement validé avec succès !");
-                        } catch (err) {
-                            console.error("Erreur de complétion backend:", err);
-                        }
-                    },
+/* ================= PI PAYMENT ================= */
 
-                    onCancel: function(paymentId) {
-                        console.log("Annulé:", paymentId);
-                        alert("Paiement annulé");
-                    },
+function initPayment(){
+    document.getElementById("paymentButton").addEventListener("click", async ()=>{
 
-                    onError: function(error) {
-                        console.error("Payment Error:", error);
-                        alert(error?.message || JSON.stringify(error) || String(error));
-                    }
+        try{
+            const payment = await Pi.createPayment({
+                amount:0.1,
+                memo:"Ninja Quiz",
+                metadata:{item:"quiz"}
+            },{
+                onReadyForServerApproval: async function(paymentId){
+
+                    console.log("APPROVAL:",paymentId);
+
+                    await fetch("/api/approve",{
+                        method:"POST",
+                        headers:{"Content-Type":"application/json"},
+                        body:JSON.stringify({paymentId})
+                    });
+
+                },
+
+                onReadyForServerCompletion: async function(paymentId,txid){
+
+                    console.log("COMPLETE:",paymentId,txid);
+
+                    await fetch("/api/complete",{
+                        method:"POST",
+                        headers:{"Content-Type":"application/json"},
+                        body:JSON.stringify({paymentId,txid})
+                    });
+
+                    alert("Paiement OK !");
                 }
-            );
+            });
 
-        } catch (error) {
-            console.error("CREATE PAYMENT ERROR:", error);
-            alert(error?.message || JSON.stringify(error) || String(error));
+        }catch(e){
+            console.log(e);
         }
+
     });
 }
 
+window.addEventListener("load",()=>{
+    initPi();
+    initPayment();
+});
 </script>
 
 </body>
