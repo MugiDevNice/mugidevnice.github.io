@@ -3,98 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ninja Quiz Premium</title>
+<title>Ninja Quiz Pi</title>
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, sans-serif;
-}
 body{
-    min-height:100vh;
-    background: radial-gradient(circle at top, #2a0000, #000);
+    margin:0;
+    font-family:Arial;
+    background:#0a0a0a;
     color:white;
     display:flex;
     justify-content:center;
     align-items:center;
-    padding:10px;
+    height:100vh;
 }
+
 .container{
-    width: 90%;
-    max-width: 450px;
-    background: rgba(10,10,10,0.95);
-    border: 1px solid rgba(255,80,0,0.4);
-    border-radius: 18px;
-    padding: 18px;
-    box-shadow: 0 0 25px rgba(255,50,0,0.2);
+    width:90%;
+    max-width:420px;
+    background:#111;
+    padding:20px;
+    border-radius:15px;
 }
-h1{
-    text-align:center;
-    color:#ff4d00;
-    font-size:22px;
-    margin-bottom:10px;
-}
-.screen{display:none;}
-.screen.active{display:block;}
-.subtitle{
-    text-align:center;
-    font-size:13px;
-    color:#aaa;
-    margin-bottom:15px;
-}
-.btn{
+
+h1{text-align:center;color:#ff4d00}
+
+.screen{display:none}
+.screen.active{display:block}
+
+button{
     width:100%;
-    padding:14px;
+    padding:12px;
     margin-top:10px;
     border:none;
-    border-radius:12px;
-    font-weight:bold;
+    border-radius:10px;
     cursor:pointer;
 }
-.level-btn{
-    background: linear-gradient(45deg,#ff4d00,#ff0000);
+
+.level{background:#ff4d00;color:white}
+
+.answer{
+    background:#222;
     color:white;
 }
-.top-bar{
+.answer:hover{background:#333}
+
+.top{
     display:flex;
     justify-content:space-between;
-    font-size:13px;
+    font-size:14px;
 }
-.progress{
-    width:100%;
-    height:10px;
+
+.bar{
+    height:8px;
     background:#222;
+    margin:10px 0;
     border-radius:10px;
     overflow:hidden;
-    margin:10px 0;
 }
-.progress-fill{
+
+.fill{
     height:100%;
     width:0%;
-    background:linear-gradient(90deg,#ff0000,#ff7b00);
+    background:#ff4d00;
 }
-.question{margin:15px 0;}
-.answer{
-    background:#1a1a1a;
-    border:1px solid #333;
-    color:white;
-    padding:12px;
-    border-radius:10px;
-    margin-top:8px;
-    cursor:pointer;
-}
-.result{text-align:center;}
-.big{font-size:22px;color:#ff7b00;}
-.badge{
-    padding:8px 12px;
-    background:rgba(255,100,0,0.15);
-    border:1px solid #ff4d00;
-    border-radius:20px;
-    display:inline-block;
-    margin-top:10px;
-}
+
+.big{text-align:center;font-size:20px;margin-top:10px}
 </style>
 
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
@@ -104,73 +77,71 @@ h1{
 
 <div class="container">
 
+<!-- START -->
 <div id="start" class="screen active">
     <h1>🥷 Ninja Quiz</h1>
-    <p class="subtitle" id="welcomeText">Teste ta puissance de shinobi</p>
 
-    <button class="btn level-btn" onclick="start('genin')">Genin</button>
-    <button class="btn level-btn" onclick="start('chunin')">Chûnin</button>
-    <button class="btn level-btn" onclick="start('kage')">Kage</button>
+    <p id="welcome">Mode invité</p>
 
-    <button id="paymentButton" class="btn" style="background:#7b2cff;color:white;">
-        🪙 Test Pi Payment (0.1 Pi)
+    <button class="level" onclick="start('genin')">Genin</button>
+    <button class="level" onclick="start('chunin')">Chunin</button>
+    <button class="level" onclick="start('kage')">Kage</button>
+
+    <button id="payBtn" style="background:#7b2cff;color:white">
+        🪙 Test Paiement Pi
     </button>
 </div>
 
-<div id="quiz" class="screen">
-    <div class="top-bar">
+<!-- GAME -->
+<div id="game" class="screen">
+    <div class="top">
         <div id="score">Score: 0</div>
-        <div>⏱ <span id="time">15</span>s</div>
+        <div>⏱ <span id="time">15</span></div>
         <div>❤️ <span id="life">3</span></div>
     </div>
 
-    <div class="progress">
-        <div id="progress" class="progress-fill"></div>
+    <div class="bar">
+        <div id="progress" class="fill"></div>
     </div>
 
     <div id="question"></div>
     <div id="answers"></div>
 </div>
 
-<div id="result" class="screen result">
-    <h1>Mission terminée</h1>
-    <div class="big" id="finalScore"></div>
-    <div id="rank"></div>
-    <div class="badge" id="badge"></div>
-
-    <button class="btn level-btn" onclick="location.reload()">Rejouer</button>
+<!-- END -->
+<div id="end" class="screen">
+    <h1>Fin</h1>
+    <div class="big" id="final"></div>
 </div>
 
 </div>
 
 <script>
-/* ================= PI SDK ================= */
 
-function waitForPi(){
-    return new Promise((res)=>{
-        const t = setInterval(()=>{
-            if(window.Pi){
-                clearInterval(t);
-                res();
-            }
-        },200);
-    });
-}
+/* ================= PI SAFE INIT ================= */
 
-async function initPi(){
+function initPiSafe(){
     try{
-        await waitForPi();
-        Pi.init({version:"2.0"});
-
-        const auth = await Pi.authenticate(["username","payments"]);
-
-        if(auth?.user?.username){
-            document.getElementById("welcomeText").innerText =
-                "Bienvenue, " + auth.user.username;
+        if(!window.Pi){
+            console.log("Pi non dispo → mode normal");
+            return;
         }
 
+        Pi.init({version:"2.0"});
+
+        Pi.authenticate(["username","payments"])
+        .then(auth=>{
+            if(auth?.user?.username){
+                document.getElementById("welcome").innerText =
+                    "Bienvenue " + auth.user.username;
+            }
+        })
+        .catch(err=>{
+            console.log("Auth error",err);
+        });
+
     }catch(e){
-        console.log("Pi error",e);
+        console.log("Pi crash safe");
     }
 }
 
@@ -178,117 +149,194 @@ async function initPi(){
 
 let data={
     genin:[
-        {q:"Naruto veut devenir ?",a:["Hokage","Roi","Samurai","Sannin"],c:0}
+        {q:"Naruto veut devenir ?",a:["Hokage","Roi","Samurai"],c:0}
     ],
     chunin:[
-        {q:"Rasengan créé par ?",a:["Minato","Naruto","Kakashi","Sasuke"],c:0}
+        {q:"Rasengan ?",a:["Minato","Sasuke","Itachi"],c:0}
     ],
     kage:[
-        {q:"1er Hokage ?",a:["Hashirama","Tobirama","Minato","Hiruzen"],c:0}
+        {q:"1er Hokage ?",a:["Hashirama","Naruto","Kakashi"],c:0}
     ]
 };
 
-let level="",questions=[],index=0,score=0,lives=3;
+let lvl=[],i=0,score=0,life=3;
+let timer=null;
+let time=15;
 
-/* ================= GAME ================= */
+/* ================= START ================= */
 
 function start(l){
-    level=l;
-    questions=data[l];
-    index=0;
+    lvl=data[l];
+    i=0;
     score=0;
-    lives=3;
-    show("quiz");
+    life=3;
+
+    show("game");
     load();
 }
 
+/* ================= LOAD ================= */
+
 function load(){
-    if(index>=questions.length || lives<=0){
+
+    if(life<=0 || i>=lvl.length){
         return end();
     }
 
-    let q=questions[index];
+    let q=lvl[i];
 
     document.getElementById("question").innerText=q.q;
     document.getElementById("score").innerText="Score: "+score;
+    document.getElementById("life").innerText=life;
 
-    let c=document.getElementById("answers");
-    c.innerHTML="";
+    let box=document.getElementById("answers");
+    box.innerHTML="";
 
-    q.a.forEach((a,i)=>{
+    q.a.forEach((a,idx)=>{
         let b=document.createElement("button");
         b.className="answer";
         b.innerText=a;
-        b.onclick=()=>check(i,q.c);
-        c.appendChild(b);
+        b.onclick=()=>check(idx,q.c);
+        box.appendChild(b);
     });
+
+    startTimer();
+    progress();
 }
 
+/* ================= TIMER FIX ================= */
+
+function startTimer(){
+
+    clearInterval(timer);
+    time=15;
+    document.getElementById("time").innerText=time;
+
+    timer=setInterval(()=>{
+
+        time--;
+        document.getElementById("time").innerText=time;
+
+        if(time<=0){
+            clearInterval(timer);
+            wrong();
+        }
+
+    },1000);
+}
+
+/* ================= ANSWER ================= */
+
 function check(i,c){
-    if(i===c)score++;
-    else lives--;
-    index++;
+
+    clearInterval(timer);
+
+    if(i===c){
+        score++;
+    }else{
+        life--;
+    }
+
+    i++;
     load();
 }
 
+/* ================= WRONG ================= */
+
+function wrong(){
+    life--;
+    i++;
+    load();
+}
+
+/* ================= PROGRESS FIX ================= */
+
+function progress(){
+    let p=(i/lvl.length)*100;
+    document.getElementById("progress").style.width=p+"%";
+}
+
+/* ================= END ================= */
+
+function end(){
+    show("end");
+    document.getElementById("final").innerText="Score: "+score;
+}
+
+/* ================= SCREEN ================= */
+
 function show(id){
-    document.querySelectorAll(".screen").forEach(e=>e.classList.remove("active"));
+    document.querySelectorAll(".screen")
+    .forEach(e=>e.classList.remove("active"));
+
     document.getElementById(id).classList.add("active");
 }
 
-function end(){
-    show("result");
-    document.getElementById("finalScore").innerText=score;
-}
-
-/* ================= PI PAYMENT (FIX MINIMAL) ================= */
+/* ================= PAYMENT SAFE ================= */
 
 function initPayment(){
-    document.getElementById("paymentButton").addEventListener("click", async ()=>{
+
+    const btn=document.getElementById("payBtn");
+
+    btn.addEventListener("click", async ()=>{
+
+        if(!window.Pi){
+            alert("Pi SDK non disponible");
+            return;
+        }
 
         try{
 
-            const payment = await Pi.createPayment({
-                amount:0.1,
-                memo:"Ninja Quiz",
-                metadata:{item:"quiz"}
-            },{
-                onReadyForServerApproval: async function(paymentId){
-
-                    console.log("APPROVAL:",paymentId);
-
-                    await fetch("/api/approve",{
-                        method:"POST",
-                        headers:{"Content-Type":"application/json"},
-                        body:JSON.stringify({paymentId})
-                    });
-
+            await Pi.createPayment(
+                {
+                    amount:0.1,
+                    memo:"Ninja Quiz",
+                    metadata:{item:"quiz"}
                 },
+                {
+                    onReadyForServerApproval: async function(paymentId){
 
-                onReadyForServerCompletion: async function(paymentId,txid){
+                        console.log("APPROVAL",paymentId);
 
-                    console.log("COMPLETE:",paymentId,txid);
+                        await fetch("/api/approve",{
+                            method:"POST",
+                            headers:{"Content-Type":"application/json"},
+                            body:JSON.stringify({paymentId})
+                        });
 
-                    await fetch("/api/complete",{
-                        method:"POST",
-                        headers:{"Content-Type":"application/json"},
-                        body:JSON.stringify({paymentId,txid})
-                    });
+                    },
 
+                    onReadyForServerCompletion: async function(paymentId,txid){
+
+                        console.log("COMPLETE",paymentId,txid);
+
+                        await fetch("/api/complete",{
+                            method:"POST",
+                            headers:{"Content-Type":"application/json"},
+                            body:JSON.stringify({paymentId,txid})
+                        });
+
+                    }
                 }
-            });
+            );
 
         }catch(e){
-            console.log("Payment error",e);
+            console.log("PAY ERROR",e);
         }
-
     });
 }
 
+/* ================= BOOT ================= */
+
 window.addEventListener("load",()=>{
-    initPi();
+
+    console.log("PAGE OK");
+
+    initPiSafe();
     initPayment();
+
 });
+
 </script>
 
 </body>
